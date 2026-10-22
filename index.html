@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gửi Một Việt Nam Cho Mai Sau</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Dancing+Script:wght@600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            parchment: '#f7f3e8',
+            parchmentDark: '#ede5d0',
+            crimson: '#8b1e1e',
+            burgundy: '#58111a',
+            bronze: '#b8860b',
+            gold: '#d4af37',
+            charcoal: '#2c2724',
+            sepiaBg: '#1f1a17',
+          },
+          fontFamily: {
+            serif: ['Cormorant Garamond', 'serif'],
+            title: ['Playfair Display', 'serif'],
+            handwriting: ['Dancing Script', 'cursive'],
+            body: ['Spectral', 'serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Texture nền giấy cổ */
+    body {
+      background-color: #f2ebd9;
+      background-image: radial-gradient(#d8ccb0 1px, transparent 0);
+      background-size: 24px 24px;
+      color: #2c2724;
+      transition: background-color 0.4s ease, color 0.4s ease;
+    }
+
+    .letter-paper {
+      background: #fdfbf7;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.05);
+      border: 1px solid #e2d7be;
+      position: relative;
+    }
+
+    /* Hiệu ứng viền cổ điển Đông Sơn / Họa tiết */
+    .dong-son-border {
+      border: 2px solid #b8860b;
+      outline: 1px solid #b8860b;
+      outline-offset: 4px;
+    }
+
+    /* Wax Seal Button */
+    .wax-seal {
+      background: radial-gradient(circle at 30% 30%, #a82828, #600d0d);
+      box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.35), inset -2px -2px 6px rgba(0, 0, 0, 0.4), inset 2px 2px 6px rgba(255, 255, 255, 0.3);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .wax-seal:hover {
+      transform: scale(1.05) rotate(2deg);
+      box-shadow: 3px 6px 15px rgba(0, 0, 0, 0.45);
+    }
+
+    /* Quoted highlight card */
+    .quote-card {
+      border-left: 4px solid #8b1e1e;
+      background: linear-gradient(90deg, rgba(139, 30, 30, 0.05) 0%, rgba(253, 251, 247, 0) 100%);
+    }
+
+    /* Chế độ Focus/Reading Mode */
+    body.focus-mode {
+      background-color: #141210 !important;
+      background-image: none !important;
+    }
+    body.focus-mode .letter-paper {
+      background-color: #1d1a17 !important;
+      color: #e6dfd3 !important;
+      border-color: #3d352e !important;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+    }
+    body.focus-mode .text-gray-600, 
+    body.focus-mode .text-gray-700 {
+      color: #c5bcac !important;
+    }
+    body.focus-mode .quote-card {
+      background: linear-gradient(90deg, rgba(184, 134, 11, 0.15) 0%, rgba(29, 26, 23, 0) 100%);
+      border-left-color: #d4af37;
+    }
+    body.focus-mode .bg-amber-50 {
+      background-color: #27221d !important;
+      border-color: #443a31 !important;
+    }
+
+    /* In ấn */
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+      body {
+        background: white !important;
+        color: black !important;
+      }
+      .letter-paper {
+        box-shadow: none !important;
+        border: none !important;
+        padding: 0 !important;
+      }
+    }
+
+    /* Smooth Scroll */
+    html {
+      scroll-behavior: smooth;
+    }
+  </style>
+</head>
+<body class="font-body min-h-screen pb-16 pt-6 px-3 sm:px-6">
+
+  <!-- thanh công cụ điều khiển cố định (Control Floating Bar) -->
+  <div class="no-print fixed top-4 right-4 sm:right-6 z-50 flex items-center gap-2 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md px-3 py-2 rounded-full shadow-lg border border-amber-200/60 text-charcoal">
+    
+    <!-- Nhạc nền -->
+    <button id="musicBtn" onclick="toggleAudio()" class="p-2 w-9 h-9 flex items-center justify-center rounded-full hover:bg-amber-100 dark:hover:bg-zinc-800 text-crimson transition-colors relative" title="Bật/Tắt nhạc không lời">
+      <i id="musicIcon" class="fa-solid fa-music"></i>
+      <span id="musicPulse" class="hidden absolute -top-1 -right-1 flex h-3 w-3">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-3 w-3 bg-red-600"></span>
+      </span>
+    </button>
+
+    <div class="h-4 w-[1px] bg-amber-300/80"></div>
+
+    <!-- Tăng giảm cỡ chữ -->
+    <button onclick="changeFontSize(-1)" class="p-2 w-9 h-9 flex items-center justify-center rounded-full hover:bg-amber-100 dark:hover:bg-zinc-800 text-amber-900 transition-colors" title="Giảm cỡ chữ">
+      <span class="font-bold text-xs">A-</span>
+    </button>
+    <button onclick="changeFontSize(1)" class="p-2 w-9 h-9 flex items-center justify-center rounded-full hover:bg-amber-100 dark:hover:bg-zinc-800 text-amber-900 transition-colors" title="Tăng cỡ chữ">
+      <span class="font-bold text-sm">A+</span>
+    </button>
+
+    <div class="h-4 w-[1px] bg-amber-300/80"></div>
+
+    <!-- Chế độ Đọc Focus Mode -->
+    <button id="focusBtn" onclick="toggleFocusMode()" class="p-2 w-9 h-9 flex items-center justify-center rounded-full hover:bg-amber-100 dark:hover:bg-zinc-800 text-amber-900 transition-colors" title="Chế độ tập trung đọc">
+      <i class="fa-solid fa-book-open"></i>
+    </button>
+
+    <!-- Copy & Print -->
+    <button onclick="copyLetterContent()" class="p-2 w-9 h-9 flex items-center justify-center rounded-full hover:bg-amber-100 dark:hover:bg-zinc-800 text-amber-900 transition-colors" title="Sao chép nội dung bức thư">
+      <i class="fa-regular fa-copy"></i>
+    </button>
+    <button onclick="window.print()" class="p-2 w-9 h-9 flex items-center justify-center rounded-full hover:bg-amber-100 dark:hover:bg-zinc-800 text-amber-900 transition-colors" title="Tải về / In thư">
+      <i class="fa-solid fa-print"></i>
+    </button>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-burgundy text-amber-100 px-5 py-2.5 rounded-full shadow-2xl text-sm font-medium opacity-0 transition-opacity duration-300 pointer-events-none flex items-center gap-2">
+    <i class="fa-solid fa-check-circle text-gold"></i>
+    <span id="toastMsg">Đã sao chép nội dung thư!</span>
+  </div>
+
+  <!-- Main Container -->
+  <main class="max-w-3xl mx-auto my-4 sm:my-8">
+    
+    <!-- THANH PHÁT VOICE ĐỌC LÁ THƯ (VOICE READER WIDGET) -->
+    <section class="no-print mb-6 bg-gradient-to-r from-amber-900/10 via-amber-800/5 to-amber-900/10 border border-amber-800/30 rounded-2xl p-4 shadow-md backdrop-blur-sm transition-all duration-300">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+        
+        <!-- Nhãn & Trạng thái phát -->
+        <div class="flex items-center gap-3 w-full md:w-auto">
+          <button id="voicePlayBtn" onclick="toggleVoicePlay()" class="w-12 h-12 flex-shrink-0 rounded-full bg-burgundy hover:bg-crimson text-amber-100 flex items-center justify-center shadow-md hover:scale-105 transition-all cursor-pointer" title="Phát / Dừng giọng đọc">
+            <i id="voicePlayIcon" class="fa-solid fa-play text-lg ml-0.5"></i>
+          </button>
+          
+          <div class="flex-1 min-w-[140px]">
+            <div class="flex items-center gap-2">
+              <span class="font-serif font-bold text-sm text-burgundy">Giọng Đọc Lá Thư</span>
+              <!-- Equalizer animation -->
+              <div id="voiceEqualizer" class="hidden flex items-end gap-0.5 h-3">
+                <span class="w-1 bg-crimson animate-bounce rounded-full h-3"></span>
+                <span class="w-1 bg-crimson animate-bounce rounded-full h-2" style="animation-delay: 0.15s"></span>
+                <span class="w-1 bg-crimson animate-bounce rounded-full h-3.5" style="animation-delay: 0.3s"></span>
+              </div>
+            </div>
+            <p id="voiceStatus" class="text-xs text-amber-900/70 font-body">Giọng đọc AI / Tự động</p>
+          </div>
+        </div>
+
+        <!-- Progress bar & Thời gian -->
+        <div class="flex-1 w-full flex items-center gap-3">
+          <span id="currentTime" class="text-xs font-mono text-amber-900/80 w-10 text-right">00:00</span>
+          <input type="range" id="voiceSeek" value="0" min="0" max="100" class="w-full h-1.5 bg-amber-200/80 rounded-lg appearance-none cursor-pointer accent-burgundy" oninput="seekVoice(this.value)">
+          <span id="totalDuration" class="text-xs font-mono text-amber-900/80 w-10">00:00</span>
+        </div>
+
+        <!-- Điều khiển phụ: Tốc độ, Âm lượng & Nút Chèn File -->
+        <div class="flex items-center justify-between md:justify-end gap-3 w-full md:w-auto border-t md:border-t-0 border-amber-900/10 pt-3 md:pt-0">
+          
+          <!-- Tốc độ đọc -->
+          <button id="speedBtn" onclick="cycleSpeed()" class="px-2 py-1 text-xs font-mono font-bold text-burgundy bg-amber-100/80 hover:bg-amber-200 rounded-md border border-amber-800/20" title="Đổi tốc độ đọc">
+            1.0x
+          </button>
+
+          <!-- Âm lượng -->
+          <div class="flex items-center gap-1.5 group relative">
+            <button onclick="toggleMuteVoice()" class="text-amber-900/80 hover:text-burgundy text-sm">
+              <i id="voiceVolIcon" class="fa-solid fa-volume-high"></i>
+            </button>
+            <input type="range" id="voiceVolume" min="0" max="1" step="0.05" value="1" class="w-16 h-1 bg-amber-200 rounded-lg appearance-none cursor-pointer accent-burgundy" oninput="changeVoiceVolume(this.value)">
+          </div>
+
+          <!-- Nút chèn Voice -->
+          <button onclick="openAudioModal()" class="px-3 py-1.5 bg-bronze/15 hover:bg-bronze/25 text-burgundy font-serif text-xs font-semibold rounded-lg border border-bronze/40 flex items-center gap-1.5 transition-colors" title="Tải lên hoặc dán link ghi âm">
+            <i class="fa-solid fa-file-audio"></i>
+            <span>Chèn Voice</span>
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Modal Chèn / Đổi Voice Audio -->
+    <div id="audioModal" class="no-print fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+      <div class="bg-parchment rounded-2xl border-2 border-bronze max-w-md w-full p-6 shadow-2xl relative text-charcoal">
+        <button onclick="closeAudioModal()" class="absolute top-4 right-4 text-amber-900/60 hover:text-burgundy text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <h3 class="font-title font-bold text-xl text-burgundy mb-1 flex items-center gap-2">
+          <i class="fa-solid fa-microphone-lines text-bronze"></i>
+          Chèn File Đọc Lá Thư
+        </h3>
+        <p class="text-xs text-amber-900/70 mb-5">Tải file MP3 ghi âm từ máy tính hoặc dán đường dẫn đính kèm.</p>
+
+        <!-- Option 1: Upload File -->
+        <div class="mb-4">
+          <label class="block text-xs font-bold text-burgundy mb-1.5 uppercase tracking-wider">Cách 1: Tải file ghi âm từ thiết bị (.mp3, .wav, .m4a)</label>
+          <input type="file" id="audioFileInput" accept="audio/*" onchange="handleAudioFileUpload(event)" class="block w-full text-xs text-amber-900 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-burgundy file:text-amber-100 hover:file:bg-crimson cursor-pointer border border-amber-800/30 rounded-lg bg-white/60 p-1">
+        </div>
+
+        <div class="flex items-center my-4">
+          <div class="flex-1 border-t border-amber-900/20"></div>
+          <span class="px-3 text-xs text-amber-900/50 font-serif">HOẶC</span>
+          <div class="flex-1 border-t border-amber-900/20"></div>
+        </div>
+
+        <!-- Option 2: Link Audio URL -->
+        <div class="mb-6">
+          <label class="block text-xs font-bold text-burgundy mb-1.5 uppercase tracking-wider">Cách 2: Nhập đường link Audio (URL)</label>
+          <div class="flex gap-2">
+            <input type="url" id="audioUrlInput" placeholder="https://example.com/voice.mp3" class="flex-1 px-3 py-2 text-xs border border-amber-800/30 rounded-lg bg-white/80 focus:outline-none focus:ring-1 focus:ring-burgundy">
+            <button onclick="handleAudioUrlSubmit()" class="px-4 py-2 bg-burgundy hover:bg-crimson text-amber-100 text-xs font-semibold rounded-lg">Áp dụng</button>
+          </div>
+        </div>
+
+        <!-- Option 3: Reset Về Đọc Tự Động SpeechSynth -->
+        <div class="pt-3 border-t border-amber-900/15 text-center">
+          <button onclick="resetToSpeechSynthesis()" class="text-xs text-burgundy font-semibold hover:underline flex items-center justify-center gap-1.5 mx-auto">
+            <i class="fa-solid fa-rotate-left"></i>
+            Dùng giọng đọc trí tuệ nhân tạo mặc định
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Audio Element ngầm -->
+    <audio id="customAudioPlayer" class="hidden"></audio>
+
+    <!-- LÁ THƯ CHÍNH -->
+    <article id="letterPaper" class="letter-paper rounded-2xl p-6 sm:p-12 md:p-16 transition-all duration-300">
+      
+      <!-- Họa tiết trang trí góc trên -->
+      <div class="flex justify-between items-center border-b border-amber-900/15 pb-6 mb-8">
+        <div class="flex items-center gap-3">
+          <!-- Icon hoa văn trống đồng cách điệu -->
+          <svg class="w-8 h-8 text-bronze" viewBox="0 0 100 100" fill="currentColor">
+            <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="4"/>
+            <circle cx="50" cy="50" r="32" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="4,3"/>
+            <circle cx="50" cy="50" r="12" fill="none" stroke="currentColor" stroke-width="3"/>
+            <path d="M 50,5 L 50,95 M 5,50 L 95,50 M 18,18 L 82,82 M 18,82 L 82,18" stroke="currentColor" stroke-width="2"/>
+          </svg>
+          <span class="font-serif tracking-widest text-xs uppercase text-amber-900/70 font-semibold">Thư Ngỏ Vượt Thời Gian</span>
+        </div>
+        
+        <div class="text-right">
+          <span class="font-serif italic text-xs text-amber-900/60 block">Nơi gửi</span>
+          <span class="font-serif font-semibold text-sm text-burgundy">TP. Hồ Chí Minh</span>
+        </div>
+      </div>
+
+      <!-- Tiêu đề lá thư -->
+      <header class="text-center my-8">
+        <h1 class="font-title text-3xl sm:text-4xl md:text-5xl font-bold text-burgundy tracking-tight leading-tight mb-3">
+          GỬI MỘT VIỆT NAM CHO MAI SAU
+        </h1>
+        <p class="font-serif italic text-amber-900/80 text-base sm:text-lg">
+          Thành phố Hồ Chí Minh, ngày 10 tháng 10 năm 2026
+        </p>
+        <div class="w-16 h-0.5 bg-bronze mx-auto mt-6 rounded-full"></div>
+      </header>
+
+      <!-- Lời chào đầu -->
+      <div class="font-handwriting text-2xl sm:text-3xl text-crimson mb-8 tracking-wide">
+        Chào bạn - người bạn đồng hành ở một ga tàu tương lai!
+      </div>
+
+      <!-- Nội dung chi tiết bức thư -->
+      <div id="letterBody" class="space-y-6 text-gray-800 text-lg leading-relaxed font-body">
+        
+        <p class="indent-8 text-justify">
+          Mình viết những dòng này vào một đêm muộn năm 2026, khi những trang sách ngữ văn lớp 12 đang mở ra trước mắt và thanh xuân của mình đang cuộn chảy trong những bước ngoặt lớn của thời đại. Đặt bút trong một tâm thế vừa háo hức vừa ngổn ngang, mình nhìn ra thế giới ngoài kia - nơi mà toàn cầu hóa không còn là một khái niệm trên giảng đường, mà đã trở thành một cơn lốc vô hình, cuốn phăng mọi ranh giới địa lý và văn hóa. Đứng giữa giao lộ ấy, mình chọn cách viết bức thư này cho bạn, không phải để thuyết giảng, mà là để gửi gắm một tiếng vọng, một lời tự sự chân thành về việc:
+        </p>
+
+        <!-- Highlight Quote 1 -->
+        <div class="quote-card my-8 p-5 sm:p-6 rounded-r-xl my-6">
+          <p class="font-title italic text-xl sm:text-2xl text-burgundy font-semibold leading-snug">
+            “Hoà nhập nhưng không hòa tan”.
+          </p>
+        </div>
+
+        <p class="indent-8 text-justify">
+          Trước hết, Thành phố hôm nay là nơi nhiều nền văn hóa cùng gặp gỡ. Toàn cầu hóa giúp người trẻ tiếp cận tri thức và những phong cách sống mới, nhưng càng mở rộng cánh cửa với thế giới, chúng ta cần nhớ mình là ai và đến từ đâu. Hội nhập không có nghĩa là đánh đổi bản sắc; đó là tiếp thu cái mới nhưng vẫn trân trọng những giá trị làm nên nét riêng của thành phố và dân tộc.
+        </p>
+
+        <p class="indent-8 text-justify">
+          Vì vậy, việc bảo tồn văn hóa phải bắt đầu từ việc hiểu và sống cùng văn hóa. Người trẻ có thể tìm hiểu lịch sử, tham quan di tích, gìn giữ tiếng Việt và trân trọng những nét văn hóa đã tạo nên diện mạo Thành phố Hồ Chí Minh. Đồng thời, chúng ta có thể kể lại những giá trị ấy bằng video, podcast, thiết kế số hay mạng xã hội. Khi đó, công nghệ sẽ trở thành cầu nối đưa văn hoá Việt Nam đến gần hơn với thế hệ trẻ và bạn bè quốc tế.
+        </p>
+
+        <!-- Highlight Quote 2 -->
+        <div class="quote-card my-8 p-5 sm:p-6 rounded-r-xl my-6">
+          <p class="font-title italic text-xl sm:text-2xl text-burgundy font-semibold leading-snug">
+            “Văn hóa chính là linh hồn của dân tộc. Không giữ được văn hóa tức là đánh mất dân tộc.”
+          </p>
+        </div>
+
+        <p class="indent-8 text-justify">
+          Bên cạnh đó, mình cũng tin văn học có khả năng lưu giữ ký ức của một thành phố. Thực tế đã chứng minh điều đó, Khi đọc những trang sách trong tác phẩm <em class="font-semibold text-burgundy">Sài Gòn – Chuyện đời của phố</em> của Phạm Công Luận. Người đọc không chỉ nhìn thấy phố phường mà còn cảm nhận được cách con người sống, yêu thương và vượt qua biến động. Đọc những trang viết ấy, mình nhận ra rằng văn học có thể làm được điều mà những con số hay tư liệu khô khan khó có thể làm: khiến một thành phố trở thành một phần ký ức trong lòng người đọc. Và đó chính là cách văn học góp phần đánh thức ý thức của con người đối với văn hóa và cộng đồng.
+        </p>
+
+        <p class="indent-8 text-justify">
+          Sau cùng, nếu một ngày bạn đọc được lá thư này ở “ga tàu” tương lai, mình chỉ mong rằng thời đại số, mỗi lựa chọn sống có ý thức với bản sắc văn hóa dân tộc của người trẻ chính là một cách để văn hóa tiếp tục sống, để lịch sử không khép lại trong trang sách, mà hiện diện trong đời sống thường ngày.
+        </p>
+
+      </div>
+
+      <!-- Chữ ký / Lời kết -->
+      <footer class="mt-12 pt-8 border-t border-amber-900/15 flex flex-col sm:flex-row justify-between items-center gap-6">
+        <div class="text-center sm:text-left">
+          <p class="font-handwriting text-3xl text-crimson">Thân gửi bạn!</p>
+          <p class="font-serif text-sm italic text-amber-900/70 mt-1">Một người trẻ của Thành phố năm 2026</p>
+        </div>
+
+        <!-- Wax Seal Badge Decorative -->
+        <div class="relative group cursor-pointer" onclick="scrollToTop()" title="Trở về đầu thư">
+          <div class="wax-seal w-20 h-20 rounded-full flex items-center justify-center text-gold font-serif font-bold text-xs tracking-wider uppercase border-2 border-yellow-600/50 text-center p-2 leading-tight">
+            VN<br>2026
+          </div>
+        </div>
+      </footer>
+
+    </article>
+
+    <!-- Thẻ cảm ngẫm dưới lá thư -->
+    <div class="no-print mt-8 bg-amber-50/80 backdrop-blur-sm border border-amber-200/80 rounded-2xl p-6 text-center text-amber-900/80 text-sm">
+      <p class="italic">
+        "Mỗi chữ viết là một viên gạch nối liền quá khứ, hiện tại và tương lai của dân tộc."
+      </p>
+    </div>
+
+  </main>
+
+  <!-- JavaScript logic -->
+  <script>
+    // Kích thước chữ ban đầu
+    let currentFontSize = 18; // px
+    const letterBody = document.getElementById('letterBody');
+
+    function changeFontSize(delta) {
+      currentFontSize = Math.min(Math.max(currentFontSize + delta, 14), 26);
+      letterBody.style.fontSize = currentFontSize + 'px';
+      letterBody.style.lineHeight = '1.8';
+      showToast(`Kích thước chữ: ${currentFontSize}px`);
+    }
+
+    // Chuyển đổi Focus Mode
+    function toggleFocusMode() {
+      document.body.classList.toggle('focus-mode');
+      const isFocus = document.body.classList.contains('focus-mode');
+      showToast(isFocus ? 'Đã bật Chế độ Tập trung Đọc' : 'Đã tắt Chế độ Tập trung');
+    }
+
+    // Sao chép nội dung lá thư
+    function copyLetterContent() {
+      const textToCopy = `GỬI MỘT VIỆT NAM CHO MAI SAU\nThành phố Hồ Chí Minh, ngày 10 tháng 10 năm 2026\n\n` + 
+        `Chào bạn - người bạn đồng hành ở một ga tàu tương lai!\n\n` +
+        `Mình viết những dòng này vào một đêm muộn năm 2026, khi những trang sách ngữ văn lớp 12 đang mở ra trước mắt và thanh xuân của mình đang cuộn chảy trong những bước ngoặt lớn của thời đại. Đặt bút trong một tâm thế vừa háo hức vừa ngổn ngang, mình nhìn ra thế giới ngoài kia - nơi mà toàn cầu hóa không còn là một khái niệm trên giảng đường, mà đã trở thành một cơn lốc vô hình, cuốn phăng mọi ranh giới địa lý và văn hóa. Đứng giữa giao lộ ấy, mình chọn cách viết bức thư này cho bạn, không phải để thuyết giảng, mà là để gửi gắm một tiếng vọng, một lời tự sự chân thành về việc: “Hoà nhập nhưng không hòa tan”.\n\n` +
+        `Trước hết, Thành phố hôm nay là nơi nhiều nền văn hóa cùng gặp gỡ. Toàn cầu hóa giúp người trẻ tiếp cận tri thức và những phong cách sống mới, nhưng càng mở rộng cánh cửa với thế giới, chúng ta cần nhớ mình là ai và đến từ đâu. Hội nhập không có nghĩa là đánh đổi bản sắc; đó là tiếp thu cái mới nhưng vẫn trân trọng những giá trị làm nên nét riêng của thành phố và dân tộc.\n\n` +
+        `Vì vậy, việc bảo tồn văn hóa phải bắt đầu từ việc hiểu và sống cùng văn hóa. Người trẻ có thể tìm hiểu lịch sử, tham quan di tích, gìn giữ tiếng Việt và trân trọng những nét văn hóa đã tạo nên diện mạo Thành phố Hồ Chí Minh. Đồng thời, chúng ta có thể kể lại những giá trị ấy bằng video, podcast, thiết kế số hay mạng xã hội. Khi đó, công nghệ sẽ trở thành cầu nối đưa văn hoá Việt Nam đến gần hơn với thế hệ trẻ và bạn bè quốc tế. Văn hóa chính là linh hồn của dân tộc. Không giữ được văn hóa tức là đánh mất dân tộc.\n\n` +
+        `Bên cạnh đó, mình cũng tin văn học có khả năng lưu giữ ký ức của một thành phố. Thực tế đã chứng minh điều đó, Khi đọc những trang sách trong tác phẩm Sài Gòn – Chuyện đời của phố của Phạm Công Luận. Người đọc không chỉ nhìn thấy phố phường mà còn cảm nhận được cách con người sống, yêu thương và vượt qua biến động. Đọc những trang viết ấy, mình nhận ra rằng văn học có thể làm được điều mà những con số hay tư liệu khô khan khó có thể làm: khiến một thành phố trở thành một phần ký ức trong lòng người đọc. Và đó chính là cách văn học góp phần đánh thức ý thức của con người đối với văn hóa và cộng đồng.\n\n` +
+        `Sau cùng, nếu một ngày bạn đọc được lá thư này ở “ga tàu” tương lai, mình chỉ mong rằng thời đại số, mỗi lựa chọn sống có ý thức với bản sắc văn hóa dân tộc của người trẻ chính là một cách để văn hóa tiếp tục sống, để lịch sử không khép lại trong trang sách, mà hiện diện trong đời sống thường ngày.\n\nThân gửi bạn!`;
+
+      // Copy bằng execCommand cho tương thích iframe
+      const dummy = document.createElement("textarea");
+      document.body.appendChild(dummy);
+      dummy.value = textToCopy;
+      dummy.select();
+      document.execCommand("copy");
+      document.body.removeChild(dummy);
+
+      showToast("Đã sao chép toàn bộ lá thư!");
+    }
+
+    // Hiển thị Toast thông báo
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toastMsg');
+      toastMsg.textContent = msg;
+      toast.classList.remove('opacity-0');
+      toast.classList.add('opacity-100');
+      
+      setTimeout(() => {
+        toast.classList.remove('opacity-100');
+        toast.classList.add('opacity-0');
+      }, 2500);
+    }
+
+    // Cuộn mượt lên đầu
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ==========================================================
+    // TRÌNH PHÁT VOICE LÁ THƯ (AUDIO / SPEECH SYNTHESIS LOGIC)
+    // ==========================================================
+    const audioPlayer = document.getElementById('customAudioPlayer');
+    const voicePlayBtn = document.getElementById('voicePlayBtn');
+    const voicePlayIcon = document.getElementById('voicePlayIcon');
+    const voiceEqualizer = document.getElementById('voiceEqualizer');
+    const voiceStatus = document.getElementById('voiceStatus');
+    const currentTimeEl = document.getElementById('currentTime');
+    const totalDurationEl = document.getElementById('totalDuration');
+    const voiceSeek = document.getElementById('voiceSeek');
+    const speedBtn = document.getElementById('speedBtn');
+
+    let isCustomAudioLoaded = false;
+    let isVoicePlaying = false;
+    let currentSpeed = 1.0;
+    const speeds = [0.8, 1.0, 1.25, 1.5];
+
+    // SpeechSynthesis Fallback Variables
+    let synth = window.speechSynthesis;
+    let utterance = null;
+    let speechProgressInterval = null;
+    let speechEstimatedTime = 120; // xấp xỉ 2 phút đọc
+
+    function initSpeechSynthesis() {
+      if (!('speechSynthesis' in window)) return;
+      
+      const fullText = `Gửi Một Việt Nam Cho Mai Sau. Thành phố Hồ Chí Minh, ngày 10 tháng 10 năm 2026. ` +
+        `Chào bạn, người bạn đồng hành ở một ga tàu tương lai! ` +
+        `Mình viết những dòng này vào một đêm muộn năm 2026, khi những trang sách ngữ văn lớp 12 đang mở ra trước mắt và thanh xuân của mình đang cuộn chảy trong những bước ngoặt lớn của thời đại. Đặt bút trong một tâm thế vừa háo hức vừa ngổn ngang, mình nhìn ra thế giới ngoài kia, nơi mà toàn cầu hóa không còn là một khái niệm trên giảng đường, mà đã trở thành một cơn lốc vô hình, cuốn phăng mọi ranh giới địa lý và văn hóa. Đứng giữa giao lộ ấy, mình chọn cách viết bức thư này cho bạn, không phải để thuyết giảng, mà là để gửi gắm một tiếng vọng, một lời tự sự chân thành về việc: Hoà nhập nhưng không hòa tan. ` +
+        `Trước hết, Thành phố hôm nay là nơi nhiều nền văn hóa cùng gặp gỡ. Toàn cầu hóa giúp người trẻ tiếp cận tri thức và những phong cách sống mới, nhưng càng mở rộng cánh cửa với thế giới, chúng ta cần nhớ mình là ai và đến từ đâu. Hội nhập không có nghĩa là đánh đổi bản sắc; đó là tiếp thu cái mới nhưng vẫn trân trọng những giá trị làm nên nét riêng của thành phố và dân tộc. ` +
+        `Vì vậy, việc bảo tồn văn hóa phải bắt đầu từ việc hiểu và sống cùng văn hóa. Người trẻ có thể tìm hiểu lịch sử, tham quan di tích, gìn giữ tiếng Việt và trân trọng những nét văn hóa đã tạo nên diện mạo Thành phố Hồ Chí Minh. Đồng thời, chúng ta có thể kể lại những giá trị ấy bằng video, podcast, thiết kế số hay mạng xã hội. Khi đó, công nghệ sẽ trở thành cầu nối đưa văn hoá Việt Nam đến gần hơn với thế hệ trẻ và bạn bè quốc tế. Văn hóa chính là linh hồn của dân tộc. Không giữ được văn hóa tức là đánh mất dân tộc. ` +
+        `Bên cạnh đó, mình cũng tin văn học có khả năng lưu giữ ký ức của một thành phố. Thực tế đã chứng minh điều đó, Khi đọc những trang sách trong tác phẩm Sài Gòn – Chuyện đời của phố của Phạm Công Luận. Người đọc không chỉ nhìn thấy phố phường mà còn cảm nhận được cách con người sống, yêu thương và vượt qua biến động. Đọc những trang viết ấy, mình nhận ra rằng văn học có thể làm được điều mà những con số hay tư liệu khô khan khó có thể làm: khiến một thành phố trở thành một phần ký ức trong lòng người đọc. Và đó chính là cách văn học góp phần đánh thức ý thức của con người đối với văn hóa và cộng đồng. ` +
+        `Sau cùng, nếu một ngày bạn đọc được lá thư này ở ga tàu tương lai, mình chỉ mong rằng thời đại số, mỗi lựa chọn sống có ý thức với bản sắc văn hóa dân tộc của người trẻ chính là một cách để văn hóa tiếp tục sống, để lịch sử không khép lại trong trang sách, mà hiện diện trong đời sống thường ngày. Thân gửi bạn!`;
+
+      utterance = new SpeechSynthesisUtterance(fullText);
+      utterance.lang = 'vi-VN';
+      utterance.rate = currentSpeed;
+
+      utterance.onend = () => {
+        stopVoiceState();
+      };
+    }
+
+    function toggleVoicePlay() {
+      if (isCustomAudioLoaded) {
+        if (audioPlayer.paused) {
+          audioPlayer.play();
+          setPlayingUI(true);
+        } else {
+          audioPlayer.pause();
+          setPlayingUI(false);
+        }
+      } else {
+        // Sử dụng SpeechSynthesis
+        if (!synth) {
+          showToast("Trình duyệt không hỗ trợ đọc tự động. Vui lòng chèn file ghi âm!");
+          openAudioModal();
+          return;
+        }
+
+        if (synth.speaking && !synth.paused) {
+          synth.pause();
+          setPlayingUI(false);
+          clearInterval(speechProgressInterval);
+        } else if (synth.paused) {
+          synth.resume();
+          setPlayingUI(true);
+          startSpeechProgressTimer();
+        } else {
+          synth.cancel();
+          initSpeechSynthesis();
+          synth.speak(utterance);
+          setPlayingUI(true);
+          startSpeechProgressTimer();
+        }
+      }
+    }
+
+    function setPlayingUI(playing) {
+      isVoicePlaying = playing;
+      if (playing) {
+        voicePlayIcon.className = "fa-solid fa-pause text-lg";
+        voiceEqualizer.classList.remove('hidden');
+      } else {
+        voicePlayIcon.className = "fa-solid fa-play text-lg ml-0.5";
+        voiceEqualizer.classList.add('hidden');
+      }
+    }
+
+    function stopVoiceState() {
+      setPlayingUI(false);
+      voiceSeek.value = 0;
+      currentTimeEl.textContent = "00:00";
+      clearInterval(speechProgressInterval);
+    }
+
+    // Giả lập tiến trình khi đọc bằng Web Speech API
+    let speechTime = 0;
+    function startSpeechProgressTimer() {
+      clearInterval(speechProgressInterval);
+      totalDurationEl.textContent = formatTime(speechEstimatedTime);
+
+      speechProgressInterval = setInterval(() => {
+        if (synth && synth.speaking && !synth.paused) {
+          speechTime += 1;
+          const pct = Math.min((speechTime / speechEstimatedTime) * 100, 100);
+          voiceSeek.value = pct;
+          currentTimeEl.textContent = formatTime(speechTime);
+
+          if (speechTime >= speechEstimatedTime) {
+            clearInterval(speechProgressInterval);
+          }
+        }
+      }, 1000);
+    }
+
+    // Audio Event Listeners cho Custom File
+    audioPlayer.ontimeupdate = () => {
+      if (!audioPlayer.duration) return;
+      const pct = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+      voiceSeek.value = pct;
+      currentTimeEl.textContent = formatTime(audioPlayer.currentTime);
+      totalDurationEl.textContent = formatTime(audioPlayer.duration);
+    };
+
+    audioPlayer.onended = () => {
+      stopVoiceState();
+    };
+
+    function seekVoice(val) {
+      if (isCustomAudioLoaded && audioPlayer.duration) {
+        audioPlayer.currentTime = (val / 100) * audioPlayer.duration;
+      } else if (synth) {
+        speechTime = Math.floor((val / 100) * speechEstimatedTime);
+        currentTimeEl.textContent = formatTime(speechTime);
+      }
+    }
+
+    function cycleSpeed() {
+      const idx = speeds.indexOf(currentSpeed);
+      currentSpeed = speeds[(idx + 1) % speeds.length];
+      speedBtn.textContent = currentSpeed + "x";
+
+      if (isCustomAudioLoaded) {
+        audioPlayer.playbackRate = currentSpeed;
+      } else if (utterance) {
+        utterance.rate = currentSpeed;
+        if (synth.speaking) {
+          synth.cancel();
+          synth.speak(utterance);
+        }
+      }
+      showToast(`Tốc độ đọc: ${currentSpeed}x`);
+    }
+
+    function changeVoiceVolume(val) {
+      audioPlayer.volume = val;
+      const icon = document.getElementById('voiceVolIcon');
+      if (val == 0) {
+        icon.className = "fa-solid fa-volume-xmark";
+      } else if (val < 0.5) {
+        icon.className = "fa-solid fa-volume-low";
+      } else {
+        icon.className = "fa-solid fa-volume-high";
+      }
+    }
+
+    function toggleMuteVoice() {
+      const volInput = document.getElementById('voiceVolume');
+      if (audioPlayer.volume > 0) {
+        audioPlayer.volume = 0;
+        volInput.value = 0;
+      } else {
+        audioPlayer.volume = 1;
+        volInput.value = 1;
+      }
+      changeVoiceVolume(volInput.value);
+    }
+
+    // Modal Control
+    function openAudioModal() {
+      const modal = document.getElementById('audioModal');
+      modal.classList.remove('opacity-0', 'pointer-events-none');
+      modal.classList.add('opacity-100');
+    }
+
+    function closeAudioModal() {
+      const modal = document.getElementById('audioModal');
+      modal.classList.remove('opacity-100');
+      modal.classList.add('opacity-0', 'pointer-events-none');
+    }
+
+    // Tải File Audio lên
+    function handleAudioFileUpload(e) {
+      const file = e.target.files[0];
+      if (file) {
+        if (synth && synth.speaking) synth.cancel();
+        
+        const fileURL = URL.createObjectURL(file);
+        audioPlayer.src = fileURL;
+        isCustomAudioLoaded = true;
+        voiceStatus.textContent = file.name;
+        closeAudioModal();
+        showToast("Đã chèn file ghi âm thành công!");
+        
+        // Auto play
+        audioPlayer.play();
+        setPlayingUI(true);
+      }
+    }
+
+    // Nhập URL Audio
+    function handleAudioUrlSubmit() {
+      const url = document.getElementById('audioUrlInput').value.trim();
+      if (url) {
+        if (synth && synth.speaking) synth.cancel();
+
+        audioPlayer.src = url;
+        isCustomAudioLoaded = true;
+        voiceStatus.textContent = "Audio từ liên kết";
+        closeAudioModal();
+        showToast("Đã tải voice từ URL!");
+
+        audioPlayer.play();
+        setPlayingUI(true);
+      }
+    }
+
+    // Khôi phục về SpeechSynthesis mặc định
+    function resetToSpeechSynthesis() {
+      if (audioPlayer) {
+        audioPlayer.pause();
+        audioPlayer.src = "";
+      }
+      isCustomAudioLoaded = false;
+      voiceStatus.textContent = "Giọng đọc AI / Tự động";
+      closeAudioModal();
+      initSpeechSynthesis();
+      showToast("Đã chuyển về giọng đọc AI tự động");
+    }
+
+    function formatTime(sec) {
+      if (isNaN(sec)) return "00:00";
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60);
+      return `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+    }
+
+    // Khởi tạo SpeechSynth khi tải trang
+    window.onload = function() {
+      initSpeechSynthesis();
+    };
+
+    // ==========================================================
+    // Web Audio API để phát âm nhạc acoustic hoài niệm (Giữ nguyên)
+    // ==========================================================
+    let audioCtx = null;
+    let isPlaying = false;
+    let timerId = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+
+    // Tạo nốt nhạc acoustic êm dịu
+    function playNote(freq, duration, delay = 0) {
+      if (!isPlaying) return;
+      setTimeout(() => {
+        if (!isPlaying || !audioCtx) return;
+        
+        try {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          
+          osc.type = 'sine'; // Âm thanh nhẹ nhàng như đàn gỗ/sáo
+          osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+          
+          // Envelope cho tiếng đàn mượt
+          gain.gain.setValueAtTime(0, audioCtx.currentTime);
+          gain.gain.linearRampToValueAtTime(0.08, audioCtx.currentTime + 0.1);
+          gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+
+          osc.start();
+          osc.stop(audioCtx.currentTime + duration);
+        } catch (e) {
+          console.error(e);
+        }
+      }, delay);
+    }
+
+    // Vòng lặp giai điệu Pentatonic nhẹ nhàng (Âm hưởng Việt Nam hoài niệm)
+    const melody = [
+      { f: 440, d: 2 },   // A4
+      { f: 493.88, d: 2 },// B4
+      { f: 554.37, d: 2.5 },// C#5
+      { f: 659.25, d: 3 },// E5
+      { f: 554.37, d: 2 },
+      { f: 493.88, d: 2 },
+      { f: 440, d: 3.5 },
+      { f: 329.63, d: 3 } // E4
+    ];
+
+    function startMelodyLoop() {
+      let step = 0;
+      function loop() {
+        if (!isPlaying) return;
+        const note = melody[step % melody.length];
+        playNote(note.f, note.d);
+        step++;
+        timerId = setTimeout(loop, 1800);
+      }
+      loop();
+    }
+
+    function toggleAudio() {
+      initAudio();
+      
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+
+      const musicIcon = document.getElementById('musicIcon');
+      const musicPulse = document.getElementById('musicPulse');
+
+      if (isPlaying) {
+        isPlaying = false;
+        clearTimeout(timerId);
+        musicIcon.className = "fa-solid fa-music";
+        musicPulse.classList.add('hidden');
+        showToast("Đã tắt nhạc nền");
+      } else {
+        isPlaying = true;
+        startMelodyLoop();
+        musicIcon.className = "fa-solid fa-volume-high text-red-700";
+        musicPulse.classList.remove('hidden');
+        showToast("Đang phát nhạc nền tự sự nhẹ nhàng");
+      }
+    }
+  </script>
+</body>
+</html>
