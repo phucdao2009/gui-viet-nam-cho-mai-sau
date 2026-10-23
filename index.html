@@ -266,7 +266,6 @@
             color: var(--accent-color);
         }
 
-        /* YOUTUBE STYLE ACTIONS & LIKERS TEXT */
         .yt-wrapper {
             margin-top: 30px;
             padding-top: 25px;
@@ -374,7 +373,6 @@
             color: #aaa;
         }
 
-        /* CULTURE & SECTIONS */
         .section-title {
             text-align: center;
             font-family: var(--font-title);
@@ -449,7 +447,6 @@
             opacity: 0.9;
         }
 
-        /* MODAL POPUPS */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -553,7 +550,6 @@
             line-height: 1.6;
         }
 
-        /* LIGHTBOX POPUP */
         .lightbox {
             display: none;
             position: fixed;
@@ -604,7 +600,6 @@
 </head>
 <body>
 
-    <!-- TOOLBAR BUTTONS -->
     <div class="top-toolbar">
         <button class="tool-btn" onclick="adjustFontSize(0.1)" title="Tăng cỡ chữ"><i class="fa-solid fa-font"></i>+</button>
         <button class="tool-btn" onclick="adjustFontSize(-0.1)" title="Giảm cỡ chữ"><i class="fa-solid fa-font"></i>-</button>
@@ -613,7 +608,6 @@
     </div>
 
     <div class="wrapper">
-        <!-- MAIN LETTER CONTENT -->
         <article class="letter-paper">
             <header class="letter-header">
                 <div class="wax-seal">VN</div>
@@ -621,7 +615,6 @@
                 <p class="letter-date">Thành phố Hồ Chí Minh, ngày 10 tháng 10 năm 2026</p>
             </header>
 
-            <!-- VOICE PLAYER PANEL -->
             <div class="voice-player-card">
                 <div class="player-top">
                     <div class="player-info">
@@ -642,7 +635,6 @@
                 </div>
             </div>
 
-            <!-- CONTENT BODY -->
             <div class="letter-content" id="letter-body">
                 <p class="salutation">Chào bạn - người bạn đồng hành ở một ga tàu tương lai!</p>
 
@@ -665,45 +657,39 @@
                 <p class="sign-off">Thân gửi bạn!</p>
             </div>
 
-            <!-- CỤM 3 NÚT CHUẨN TỪ ẢNH CHỤP YOUTUBE & HIỂN THỊ SỐ NGƯỜI LIKE -->
+            <!-- YOUTUBE ACTIONS & GLOBAL LIKES -->
             <div class="yt-wrapper">
                 <div class="yt-actions-container">
-                    <!-- Nút 1: Pill Thích & Dislike (Mặc định 0) -->
                     <div class="yt-pill-button">
-                        <button class="yt-sub-btn" id="yt-like-btn" onclick="toggleYtLike()">
+                        <button class="yt-sub-btn" id="yt-like-btn" onclick="handleGlobalLike()">
                             <i class="fa-regular fa-thumbs-up" id="yt-like-icon"></i>
                             <span id="yt-like-text">0</span>
                         </button>
                         <div class="yt-divider"></div>
-                        <button class="yt-sub-btn" id="yt-dislike-btn" onclick="toggleYtDislike()">
+                        <button class="yt-sub-btn" id="yt-dislike-btn" onclick="handleGlobalDislike()">
                             <i class="fa-regular fa-thumbs-down" id="yt-dislike-icon"></i>
                         </button>
                     </div>
 
-                    <!-- Nút 2: Chia sẻ -->
                     <button class="yt-action-btn" onclick="openShareModal()">
                         <i class="fa-solid fa-share"></i> Chia sẻ
                     </button>
 
-                    <!-- Nút 3: Đặt câu hỏi -->
                     <button class="yt-action-btn" onclick="openQuestionModal()">
                         <i class="fa-solid fa-wand-magic-sparkles"></i> Đặt câu hỏi
                     </button>
                 </div>
 
-                <!-- Dòng ghi nhận số lượng người thích -->
                 <div class="likers-info-text" id="likers-info-text">
-                    Chưa có lượt thích nào. Hãy là người đầu tiên thả tim cho lá thư này!
+                    Đã có <strong id="total-likers-count">0</strong> lượt thích ghi nhận từ cộng đồng.
                 </div>
             </div>
         </article>
 
-        <!-- HERITAGE & CULTURE SECTION -->
         <section>
             <h2 class="section-title">Di Sản & Bản Sắc Văn Hóa Việt Nam</h2>
             <div class="culture-grid">
                 
-                <!-- 1. Áo Dài -->
                 <div class="culture-card">
                     <div class="culture-img-box" onclick="openLightbox('1.jpg')">
                         <img src="1.jpg" alt="Áo Dài Việt Nam[cite: 4]">
@@ -714,7 +700,6 @@
                     </div>
                 </div>
 
-                <!-- 2. Múa Rối Nước -->
                 <div class="culture-card">
                     <div class="culture-img-box" onclick="openLightbox('2.jpg')">
                         <img src="2.jpg" alt="Nghệ Thuật Múa Rối Nước[cite: 3]">
@@ -725,7 +710,6 @@
                     </div>
                 </div>
 
-                <!-- 3. Cải Lương -->
                 <div class="culture-card">
                     <div class="culture-img-box" onclick="openLightbox('3.jpg')">
                         <img src="3.jpg" alt="Nghệ Thuật Cải Lương Nam Bộ[cite: 2]">
@@ -736,7 +720,6 @@
                     </div>
                 </div>
 
-                <!-- 4. Thư Pháp -->
                 <div class="culture-card">
                     <div class="culture-img-box" onclick="openLightbox('4.jpg')">
                         <img src="4.jpg" alt="Chữ Thư Pháp Việt[cite: 1]">
@@ -747,7 +730,6 @@
                     </div>
                 </div>
 
-                <!-- 5. Đờn Ca Tài Tử Nam Bộ -->
                 <div class="culture-card">
                     <div class="culture-img-box" onclick="openLightbox('5.jpg')">
                         <img src="5.jpg" alt="Đờn Ca Tài Tử Nam Bộ[cite: 8]">
@@ -761,7 +743,6 @@
             </div>
         </section>
 
-        <!-- THEN AND NOW SECTION -->
         <section>
             <h2 class="section-title">Sài Gòn - Thành Phố Hồ Chí Minh: Xưa & Nay</h2>
             <div class="culture-grid">
@@ -841,7 +822,7 @@
         <img id="lightbox-img" src="" alt="Xem ảnh phóng to">
     </div>
 
-    <!-- JAVASCRIPT -->
+    <!-- JAVASCRIPT HỖ TRỢ VSC VÀ BỘ ĐẾM TOÀN CẦU AN TOÀN -->
     <script>
         // 1. VOICE READ API
         let synth = window.speechSynthesis;
@@ -916,69 +897,105 @@
             document.getElementById('lightbox').style.display = 'none';
         }
 
-        // 5. YOUTUBE LIKE / DISLIKE INTERACTION & LIKERS COUNT
-        let likeCount = 0;
-        let isLiked = false;
-        let isDisliked = false;
+        // 5. HYBRID CLOUD LIKE SYSTEM (HỖ TRỢ CHẠY CẢ TRÊN VSC & SERVER THẬT)
+        let globalLikes = parseInt(localStorage.getItem('global_likes_store')) || 0;
+        let hasLiked = localStorage.getItem('user_has_liked') === 'true';
+        let hasDisliked = localStorage.getItem('user_has_disliked') === 'true';
 
-        function updateLikeDisplay() {
-            const likeBtn = document.getElementById('yt-like-btn');
-            const dislikeBtn = document.getElementById('yt-dislike-btn');
-            const likeIcon = document.getElementById('yt-like-icon');
-            const dislikeIcon = document.getElementById('yt-dislike-icon');
-            const likeText = document.getElementById('yt-like-text');
+        function updateUI() {
+            document.getElementById('yt-like-text').innerText = globalLikes;
             const infoText = document.getElementById('likers-info-text');
 
-            likeText.innerText = likeCount;
-
-            if (isLiked) {
-                likeBtn.classList.add('active-like');
-                dislikeBtn.classList.remove('active-dislike');
-                likeIcon.className = 'fa-solid fa-thumbs-up';
-                dislikeIcon.className = 'fa-regular fa-thumbs-down';
-                infoText.innerHTML = `Đã có <strong>${likeCount} người</strong> (bao gồm <strong>Bạn</strong>) thích lá thư này.`;
-            } else if (isDisliked) {
-                likeBtn.classList.remove('active-like');
-                dislikeBtn.classList.add('active-dislike');
-                likeIcon.className = 'fa-regular fa-thumbs-up';
-                dislikeIcon.className = 'fa-solid fa-thumbs-down';
-                infoText.innerHTML = `Chưa có lượt thích nào. Hãy thả tim cho lá thư này nhé!`;
+            if (hasLiked) {
+                document.getElementById('yt-like-btn').classList.add('active-like');
+                document.getElementById('yt-dislike-btn').classList.remove('active-dislike');
+                document.getElementById('yt-like-icon').className = 'fa-solid fa-thumbs-up';
+                document.getElementById('yt-dislike-icon').className = 'fa-regular fa-thumbs-down';
+                infoText.innerHTML = `Đã có <strong>${globalLikes} lượt thích</strong> (bao gồm <strong>Bạn</strong>) ghi nhận từ cộng đồng.`;
+            } else if (hasDisliked) {
+                document.getElementById('yt-like-btn').classList.remove('active-like');
+                document.getElementById('yt-dislike-btn').classList.add('active-dislike');
+                document.getElementById('yt-like-icon').className = 'fa-regular fa-thumbs-up';
+                document.getElementById('yt-dislike-icon').className = 'fa-solid fa-thumbs-down';
+                infoText.innerHTML = `Đã có <strong>${globalLikes} lượt thích</strong> ghi nhận từ cộng đồng.`;
             } else {
-                likeBtn.classList.remove('active-like');
-                dislikeBtn.classList.remove('active-dislike');
-                likeIcon.className = 'fa-regular fa-thumbs-up';
-                dislikeIcon.className = 'fa-regular fa-thumbs-down';
-                if (likeCount === 0) {
+                document.getElementById('yt-like-btn').classList.remove('active-like');
+                document.getElementById('yt-dislike-btn').classList.remove('active-dislike');
+                document.getElementById('yt-like-icon').className = 'fa-regular fa-thumbs-up';
+                document.getElementById('yt-dislike-icon').className = 'fa-regular fa-thumbs-down';
+                if (globalLikes === 0) {
                     infoText.innerHTML = `Chưa có lượt thích nào. Hãy là người đầu tiên thả tim cho lá thư này!`;
                 } else {
-                    infoText.innerHTML = `Đã có <strong>${likeCount} người</strong> thích lá thư này.`;
+                    infoText.innerHTML = `Đã có <strong>${globalLikes} lượt thích</strong> ghi nhận từ cộng đồng.`;
                 }
             }
         }
 
-        function toggleYtLike() {
-            if (!isLiked) {
-                isLiked = true;
-                if (isDisliked) isDisliked = false;
-                likeCount = 1;
-            } else {
-                isLiked = false;
-                likeCount = 0;
+        // Lấy dữ liệu online
+        async function fetchLikesFromApi() {
+            try {
+                let res = await fetch('https://api.counterapi.dev/v1/gui-viet-nam-cho-mai-sau-2026/likes');
+                if (res.ok) {
+                    let data = await res.json();
+                    if (data && data.count !== undefined) {
+                        globalLikes = data.count;
+                        localStorage.setItem('global_likes_store', globalLikes);
+                    }
+                }
+            } catch (e) {
+                console.log("Sử dụng bộ đếm nội bộ VSC");
             }
-            updateLikeDisplay();
+            updateUI();
         }
 
-        function toggleYtDislike() {
-            if (!isDisliked) {
-                isDisliked = true;
-                if (isLiked) {
-                    isLiked = false;
-                    likeCount = 0;
+        fetchLikesFromApi();
+
+        async function handleGlobalLike() {
+            if (!hasLiked) {
+                hasLiked = true;
+                if (hasDisliked) hasDisliked = false;
+                globalLikes += 1;
+                localStorage.setItem('global_likes_store', globalLikes);
+                localStorage.setItem('user_has_liked', 'true');
+                localStorage.setItem('user_has_disliked', 'false');
+                updateUI();
+
+                // Đồng bộ lên máy chủ đám mây
+                try {
+                    await fetch('https://api.counterapi.dev/v1/gui-viet-nam-cho-mai-sau-2026/likes/up');
+                } catch (e) {
+                    console.log("Đã lưu lượt thích nội bộ");
                 }
             } else {
-                isDisliked = false;
+                hasLiked = false;
+                globalLikes = Math.max(0, globalLikes - 1);
+                localStorage.setItem('global_likes_store', globalLikes);
+                localStorage.setItem('user_has_liked', 'false');
+                updateUI();
+
+                try {
+                    await fetch('https://api.counterapi.dev/v1/gui-viet-nam-cho-mai-sau-2026/likes/down');
+                } catch (e) {
+                    console.log("Đã cập nhật lượt thích nội bộ");
+                }
             }
-            updateLikeDisplay();
+        }
+
+        function handleGlobalDislike() {
+            if (!hasDisliked) {
+                hasDisliked = true;
+                if (hasLiked) {
+                    hasLiked = false;
+                    globalLikes = Math.max(0, globalLikes - 1);
+                    localStorage.setItem('global_likes_store', globalLikes);
+                    localStorage.setItem('user_has_liked', 'false');
+                }
+                localStorage.setItem('user_has_disliked', 'true');
+            } else {
+                hasDisliked = false;
+                localStorage.setItem('user_has_disliked', 'false');
+            }
+            updateUI();
         }
 
         // 6. MODALS
