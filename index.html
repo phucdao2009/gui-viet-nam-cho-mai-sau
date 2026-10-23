@@ -657,16 +657,16 @@
                 <p class="sign-off">Thân gửi bạn!</p>
             </div>
 
-            <!-- YOUTUBE ACTIONS & GLOBAL LIKES SYSTEM -->
+            <!-- YOUTUBE ACTIONS & LIKE SYSTEM -->
             <div class="yt-wrapper">
                 <div class="yt-actions-container">
                     <div class="yt-pill-button">
-                        <button class="yt-sub-btn" id="yt-like-btn" onclick="toggleGlobalLike()">
+                        <button class="yt-sub-btn" id="yt-like-btn" onclick="toggleLike()">
                             <i class="fa-regular fa-thumbs-up" id="yt-like-icon"></i>
                             <span id="yt-like-text">0</span>
                         </button>
                         <div class="yt-divider"></div>
-                        <button class="yt-sub-btn" id="yt-dislike-btn" onclick="toggleGlobalDislike()">
+                        <button class="yt-sub-btn" id="yt-dislike-btn" onclick="toggleDislike()">
                             <i class="fa-regular fa-thumbs-down" id="yt-dislike-icon"></i>
                         </button>
                     </div>
@@ -822,110 +822,76 @@
         <img id="lightbox-img" src="" alt="Xem ảnh phóng to">
     </div>
 
-    <!-- JAVASCRIPT HỆ THỐNG ĐỒNG BỘ LIKE CHUẨN V2 -->
+    <!-- JAVASCRIPT HỆ THỐNG LIKE CHUẨN MƯỢT MÀ -->
     <script>
-        // Sử dụng namespace dự án công cộng bảo mật
-        const API_NAMESPACE = "gui_viet_nam_mai_sau_2026_vn";
-        const API_KEY = "likes_count";
-
-        let globalLikes = 0;
-        let userLiked = localStorage.getItem('user_has_liked') === 'true';
-        let userDisliked = localStorage.getItem('user_has_disliked') === 'true';
-
-        // Tải lượt Like đồng bộ từ Server
-        function fetchLikes() {
-            fetch(`https://api.counterapi.dev/v1/${API_NAMESPACE}/${API_KEY}`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data && typeof data.count === 'number') {
-                        globalLikes = data.count;
-                        localStorage.setItem('local_backup_likes', globalLikes);
-                    } else {
-                        createNamespace();
-                    }
-                    updateUI();
-                })
-                .catch(() => {
-                    globalLikes = parseInt(localStorage.getItem('local_backup_likes')) || 0;
-                    updateUI();
-                });
-        }
-
-        function createNamespace() {
-            fetch(`https://api.counterapi.dev/v1/${API_NAMESPACE}/${API_KEY}/set?count=0`)
-                .then(() => fetchLikes())
-                .catch(() => {});
-        }
+        let currentLikes = parseInt(localStorage.getItem('letter_total_likes')) || 0;
+        let isLiked = localStorage.getItem('user_has_liked') === 'true';
+        let isDisliked = localStorage.getItem('user_has_disliked') === 'true';
 
         function updateUI() {
-            document.getElementById('yt-like-text').innerText = globalLikes;
+            document.getElementById('yt-like-text').innerText = currentLikes;
+            document.getElementById('total-likes-display').innerText = currentLikes;
             const infoText = document.getElementById('likers-info-text');
 
-            if (userLiked) {
+            if (isLiked) {
                 document.getElementById('yt-like-btn').classList.add('active-like');
                 document.getElementById('yt-dislike-btn').classList.remove('active-dislike');
                 document.getElementById('yt-like-icon').className = 'fa-solid fa-thumbs-up';
                 document.getElementById('yt-dislike-icon').className = 'fa-regular fa-thumbs-down';
-                infoText.innerHTML = `Đã có <strong>${globalLikes} lượt thích</strong> (bao gồm <strong>Bạn</strong>) ghi nhận từ cộng đồng.`;
-            } else if (userDisliked) {
+                infoText.innerHTML = `Đã có <strong>${currentLikes} lượt thích</strong> (bao gồm <strong>Bạn</strong>) ghi nhận từ cộng đồng.`;
+            } else if (isDisliked) {
                 document.getElementById('yt-like-btn').classList.remove('active-like');
                 document.getElementById('yt-dislike-btn').classList.add('active-dislike');
                 document.getElementById('yt-like-icon').className = 'fa-regular fa-thumbs-up';
                 document.getElementById('yt-dislike-icon').className = 'fa-solid fa-thumbs-down';
-                infoText.innerHTML = `Đã có <strong>${globalLikes} lượt thích</strong> ghi nhận từ cộng đồng.`;
+                infoText.innerHTML = `Đã có <strong>${currentLikes} lượt thích</strong> ghi nhận từ cộng đồng.`;
             } else {
                 document.getElementById('yt-like-btn').classList.remove('active-like');
                 document.getElementById('yt-dislike-btn').classList.remove('active-dislike');
                 document.getElementById('yt-like-icon').className = 'fa-regular fa-thumbs-up';
                 document.getElementById('yt-dislike-icon').className = 'fa-regular fa-thumbs-down';
-                if (globalLikes === 0) {
+                if (currentLikes === 0) {
                     infoText.innerHTML = `Chưa có lượt thích nào. Hãy là người đầu tiên thả tim cho lá thư này!`;
                 } else {
-                    infoText.innerHTML = `Đã có <strong>${globalLikes} lượt thích</strong> ghi nhận từ cộng đồng.`;
+                    infoText.innerHTML = `Đã có <strong>${currentLikes} lượt thích</strong> ghi nhận từ cộng đồng.`;
                 }
             }
         }
 
-        function toggleGlobalLike() {
-            if (!userLiked) {
-                userLiked = true;
-                if (userDisliked) userDisliked = false;
-                globalLikes += 1;
+        function toggleLike() {
+            if (!isLiked) {
+                isLiked = true;
+                if (isDisliked) isDisliked = false;
+                currentLikes += 1;
                 localStorage.setItem('user_has_liked', 'true');
                 localStorage.setItem('user_has_disliked', 'false');
-                updateUI();
-
-                fetch(`https://api.counterapi.dev/v1/${API_NAMESPACE}/${API_KEY}/up`)
-                    .catch(() => {});
             } else {
-                userLiked = false;
-                globalLikes = Math.max(0, globalLikes - 1);
+                isLiked = false;
+                currentLikes = Math.max(0, currentLikes - 1);
                 localStorage.setItem('user_has_liked', 'false');
-                updateUI();
-
-                fetch(`https://api.counterapi.dev/v1/${API_NAMESPACE}/${API_KEY}/down`)
-                    .catch(() => {});
             }
-        }
-
-        function toggleGlobalDislike() {
-            if (!userDisliked) {
-                userDisliked = true;
-                if (userLiked) {
-                    userLiked = false;
-                    globalLikes = Math.max(0, globalLikes - 1);
-                    localStorage.setItem('user_has_liked', 'false');
-                    fetch(`https://api.counterapi.dev/v1/${API_NAMESPACE}/${API_KEY}/down`).catch(() => {});
-                }
-                localStorage.setItem('user_has_disliked', 'true');
-            } else {
-                userDisliked = false;
-                localStorage.setItem('user_has_disliked', 'false');
-            }
+            localStorage.setItem('letter_total_likes', currentLikes);
             updateUI();
         }
 
-        fetchLikes();
+        function toggleDislike() {
+            if (!isDisliked) {
+                isDisliked = true;
+                if (isLiked) {
+                    isLiked = false;
+                    currentLikes = Math.max(0, currentLikes - 1);
+                    localStorage.setItem('user_has_liked', 'false');
+                }
+                localStorage.setItem('user_has_disliked', 'true');
+            } else {
+                isDisliked = false;
+                localStorage.setItem('user_has_disliked', 'false');
+            }
+            localStorage.setItem('letter_total_likes', currentLikes);
+            updateUI();
+        }
+
+        updateUI();
 
         // VOICE READ API
         let synth = window.speechSynthesis;
