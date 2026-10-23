@@ -597,10 +597,6 @@
             }
         }
     </style>
-
-    <!-- KẾT NỐI SẮC NẮT TỚI FIREBASE ĐÁM MÂY TỰ ĐỘNG KHÔNG BỊ CÓ CÓ CHẤT CÓ CÁC RÀO CẢN BẢO MẬT -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
 
@@ -661,16 +657,16 @@
                 <p class="sign-off">Thân gửi bạn!</p>
             </div>
 
-            <!-- YOUTUBE ACTIONS & FIREBASE LIKES -->
+            <!-- YOUTUBE ACTIONS & GLOBAL LIKES SYSTEM -->
             <div class="yt-wrapper">
                 <div class="yt-actions-container">
                     <div class="yt-pill-button">
-                        <button class="yt-sub-btn" id="yt-like-btn" onclick="handleGlobalLike()">
+                        <button class="yt-sub-btn" id="yt-like-btn" onclick="toggleGlobalLike()">
                             <i class="fa-regular fa-thumbs-up" id="yt-like-icon"></i>
-                            <span id="yt-like-text">...</span>
+                            <span id="yt-like-text">0</span>
                         </button>
                         <div class="yt-divider"></div>
-                        <button class="yt-sub-btn" id="yt-dislike-btn" onclick="handleGlobalDislike()">
+                        <button class="yt-sub-btn" id="yt-dislike-btn" onclick="toggleGlobalDislike()">
                             <i class="fa-regular fa-thumbs-down" id="yt-dislike-icon"></i>
                         </button>
                     </div>
@@ -685,7 +681,7 @@
                 </div>
 
                 <div class="likers-info-text" id="likers-info-text">
-                    Đang kết nối dữ liệu lượt thích thời gian thực...
+                    Đã có <strong id="total-likes-display">0</strong> lượt thích ghi nhận từ cộng đồng.
                 </div>
             </div>
         </article>
@@ -826,42 +822,52 @@
         <img id="lightbox-img" src="" alt="Xem ảnh phóng to">
     </div>
 
-    <!-- JAVASCRIPT ĐỒNG BỘ MẠNH MẼ KHÔNG BỊ CHẶN BỞI BẤT KỲ ĐIỀU KIỆN NÀO -->
+    <!-- JAVASCRIPT HỆ THỐNG ĐỒNG BỘ LIKE CHUẨN V2 -->
     <script>
-        // CẤU HÌNH CƠ SỞ DỮ LIỆU ĐÁM MÂY GOOGLE FIREBASE
-        const firebaseConfig = {
-            databaseURL: "https://guivietnamchomaisau-default-rtdb.asia-southeast1.firebasedatabase.app"
-        };
-        
-        // Khởi tạo kết nối 
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        const db = firebase.database();
-        const likesRef = db.ref('likes_count');
+        // Sử dụng namespace dự án công cộng bảo mật
+        const API_NAMESPACE = "gui_viet_nam_mai_sau_2026_vn";
+        const API_KEY = "likes_count";
 
         let globalLikes = 0;
-        let hasLiked = localStorage.getItem('user_has_liked') === 'true';
-        let hasDisliked = localStorage.getItem('user_has_disliked') === 'true';
+        let userLiked = localStorage.getItem('user_has_liked') === 'true';
+        let userDisliked = localStorage.getItem('user_has_disliked') === 'true';
 
-        // Lắng nghe sự thay đổi con số Lượt Thích Đám Mây THỜI GIAN THỰC
-        likesRef.on('value', (snapshot) => {
-            const val = snapshot.val();
-            globalLikes = (val !== null) ? val : 0;
-            updateUI();
-        });
+        // Tải lượt Like đồng bộ từ Server
+        function fetchLikes() {
+            fetch(`https://api.counterapi.dev/v1/${API_NAMESPACE}/${API_KEY}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data && typeof data.count === 'number') {
+                        globalLikes = data.count;
+                        localStorage.setItem('local_backup_likes', globalLikes);
+                    } else {
+                        createNamespace();
+                    }
+                    updateUI();
+                })
+                .catch(() => {
+                    globalLikes = parseInt(localStorage.getItem('local_backup_likes')) || 0;
+                    updateUI();
+                });
+        }
+
+        function createNamespace() {
+            fetch(`https://api.counterapi.dev/v1/${API_NAMESPACE}/${API_KEY}/set?count=0`)
+                .then(() => fetchLikes())
+                .catch(() => {});
+        }
 
         function updateUI() {
             document.getElementById('yt-like-text').innerText = globalLikes;
             const infoText = document.getElementById('likers-info-text');
 
-            if (hasLiked) {
+            if (userLiked) {
                 document.getElementById('yt-like-btn').classList.add('active-like');
                 document.getElementById('yt-dislike-btn').classList.remove('active-dislike');
                 document.getElementById('yt-like-icon').className = 'fa-solid fa-thumbs-up';
                 document.getElementById('yt-dislike-icon').className = 'fa-regular fa-thumbs-down';
                 infoText.innerHTML = `Đã có <strong>${globalLikes} lượt thích</strong> (bao gồm <strong>Bạn</strong>) ghi nhận từ cộng đồng.`;
-            } else if (hasDisliked) {
+            } else if (userDisliked) {
                 document.getElementById('yt-like-btn').classList.remove('active-like');
                 document.getElementById('yt-dislike-btn').classList.add('active-dislike');
                 document.getElementById('yt-like-icon').className = 'fa-regular fa-thumbs-up';
@@ -880,42 +886,46 @@
             }
         }
 
-        function handleGlobalLike() {
-            if (!hasLiked) {
-                hasLiked = true;
-                if (hasDisliked) hasDisliked = false;
-                
-                // Tăng 1 trên máy chủ đám mây
-                likesRef.transaction((current) => (current || 0) + 1);
-                
+        function toggleGlobalLike() {
+            if (!userLiked) {
+                userLiked = true;
+                if (userDisliked) userDisliked = false;
+                globalLikes += 1;
                 localStorage.setItem('user_has_liked', 'true');
                 localStorage.setItem('user_has_disliked', 'false');
+                updateUI();
+
+                fetch(`https://api.counterapi.dev/v1/${API_NAMESPACE}/${API_KEY}/up`)
+                    .catch(() => {});
             } else {
-                hasLiked = false;
-                
-                // Giảm 1 trên máy chủ đám mây
-                likesRef.transaction((current) => Math.max(0, (current || 0) - 1));
-                
+                userLiked = false;
+                globalLikes = Math.max(0, globalLikes - 1);
                 localStorage.setItem('user_has_liked', 'false');
+                updateUI();
+
+                fetch(`https://api.counterapi.dev/v1/${API_NAMESPACE}/${API_KEY}/down`)
+                    .catch(() => {});
+            }
+        }
+
+        function toggleGlobalDislike() {
+            if (!userDisliked) {
+                userDisliked = true;
+                if (userLiked) {
+                    userLiked = false;
+                    globalLikes = Math.max(0, globalLikes - 1);
+                    localStorage.setItem('user_has_liked', 'false');
+                    fetch(`https://api.counterapi.dev/v1/${API_NAMESPACE}/${API_KEY}/down`).catch(() => {});
+                }
+                localStorage.setItem('user_has_disliked', 'true');
+            } else {
+                userDisliked = false;
+                localStorage.setItem('user_has_disliked', 'false');
             }
             updateUI();
         }
 
-        function handleGlobalDislike() {
-            if (!hasDisliked) {
-                hasDisliked = true;
-                if (hasLiked) {
-                    hasLiked = false;
-                    likesRef.transaction((current) => Math.max(0, (current || 0) - 1));
-                    localStorage.setItem('user_has_liked', 'false');
-                }
-                localStorage.setItem('user_has_disliked', 'true');
-            } else {
-                hasDisliked = false;
-                localStorage.setItem('user_has_disliked', 'false');
-            }
-            updateUI();
-        }
+        fetchLikes();
 
         // VOICE READ API
         let synth = window.speechSynthesis;
