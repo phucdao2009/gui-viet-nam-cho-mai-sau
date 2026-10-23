@@ -597,6 +597,10 @@
             }
         }
     </style>
+
+    <!-- KẾT NỐI SẮC NẮT TỚI FIREBASE ĐÁM MÂY TỰ ĐỘNG KHÔNG BỊ CÓ CÓ CHẤT CÓ CÁC RÀO CẢN BẢO MẬT -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
 
@@ -657,13 +661,13 @@
                 <p class="sign-off">Thân gửi bạn!</p>
             </div>
 
-            <!-- YOUTUBE ACTIONS & GLOBAL LIKES -->
+            <!-- YOUTUBE ACTIONS & FIREBASE LIKES -->
             <div class="yt-wrapper">
                 <div class="yt-actions-container">
                     <div class="yt-pill-button">
                         <button class="yt-sub-btn" id="yt-like-btn" onclick="handleGlobalLike()">
                             <i class="fa-regular fa-thumbs-up" id="yt-like-icon"></i>
-                            <span id="yt-like-text">0</span>
+                            <span id="yt-like-text">...</span>
                         </button>
                         <div class="yt-divider"></div>
                         <button class="yt-sub-btn" id="yt-dislike-btn" onclick="handleGlobalDislike()">
@@ -681,7 +685,7 @@
                 </div>
 
                 <div class="likers-info-text" id="likers-info-text">
-                    Đã có <strong id="total-likers-count">0</strong> lượt thích ghi nhận từ cộng đồng.
+                    Đang kết nối dữ liệu lượt thích thời gian thực...
                 </div>
             </div>
         </article>
@@ -732,7 +736,7 @@
 
                 <div class="culture-card">
                     <div class="culture-img-box" onclick="openLightbox('5.jpg')">
-                        <img src="5.jpg" alt="Đờn Ca Tài Tử Nam Bộ[cite: 8]">
+                        <img src="5.jpg" alt="Đờn Ca Tài Tử Nam Bộ">
                     </div>
                     <div class="culture-body">
                         <h3>5. Đờn Ca Tài Tử Nam Bộ</h3>
@@ -748,7 +752,7 @@
             <div class="culture-grid">
                 <div class="culture-card">
                     <div class="culture-img-box" onclick="openLightbox('6.jpg')">
-                        <img src="6.jpg" alt="Chợ Bến Thành Xưa & Nay[cite: 7]">
+                        <img src="6.jpg" alt="Chợ Bến Thành Xưa & Nay">
                     </div>
                     <div class="culture-body">
                         <h3>Chợ Bến Thành - Nhịp Sống Tiếp Nối</h3>
@@ -758,7 +762,7 @@
 
                 <div class="culture-card">
                     <div class="culture-img-box" onclick="openLightbox('7.jpg')">
-                        <img src="7.jpg" alt="Dinh Thống Nhất / Kiến Trúc Xưa & Nay[cite: 6]">
+                        <img src="7.jpg" alt="Dinh Thống Nhất / Kiến Trúc Xưa & Nay">
                     </div>
                     <div class="culture-body">
                         <h3>Di Tích Lịch Sử - Nối Liền Thời Đại</h3>
@@ -822,9 +826,98 @@
         <img id="lightbox-img" src="" alt="Xem ảnh phóng to">
     </div>
 
-    <!-- JAVASCRIPT HỖ TRỢ VSC VÀ BỘ ĐẾM TOÀN CẦU AN TOÀN -->
+    <!-- JAVASCRIPT ĐỒNG BỘ MẠNH MẼ KHÔNG BỊ CHẶN BỞI BẤT KỲ ĐIỀU KIỆN NÀO -->
     <script>
-        // 1. VOICE READ API
+        // CẤU HÌNH CƠ SỞ DỮ LIỆU ĐÁM MÂY GOOGLE FIREBASE
+        const firebaseConfig = {
+            databaseURL: "https://guivietnamchomaisau-default-rtdb.asia-southeast1.firebasedatabase.app"
+        };
+        
+        // Khởi tạo kết nối 
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.database();
+        const likesRef = db.ref('likes_count');
+
+        let globalLikes = 0;
+        let hasLiked = localStorage.getItem('user_has_liked') === 'true';
+        let hasDisliked = localStorage.getItem('user_has_disliked') === 'true';
+
+        // Lắng nghe sự thay đổi con số Lượt Thích Đám Mây THỜI GIAN THỰC
+        likesRef.on('value', (snapshot) => {
+            const val = snapshot.val();
+            globalLikes = (val !== null) ? val : 0;
+            updateUI();
+        });
+
+        function updateUI() {
+            document.getElementById('yt-like-text').innerText = globalLikes;
+            const infoText = document.getElementById('likers-info-text');
+
+            if (hasLiked) {
+                document.getElementById('yt-like-btn').classList.add('active-like');
+                document.getElementById('yt-dislike-btn').classList.remove('active-dislike');
+                document.getElementById('yt-like-icon').className = 'fa-solid fa-thumbs-up';
+                document.getElementById('yt-dislike-icon').className = 'fa-regular fa-thumbs-down';
+                infoText.innerHTML = `Đã có <strong>${globalLikes} lượt thích</strong> (bao gồm <strong>Bạn</strong>) ghi nhận từ cộng đồng.`;
+            } else if (hasDisliked) {
+                document.getElementById('yt-like-btn').classList.remove('active-like');
+                document.getElementById('yt-dislike-btn').classList.add('active-dislike');
+                document.getElementById('yt-like-icon').className = 'fa-regular fa-thumbs-up';
+                document.getElementById('yt-dislike-icon').className = 'fa-solid fa-thumbs-down';
+                infoText.innerHTML = `Đã có <strong>${globalLikes} lượt thích</strong> ghi nhận từ cộng đồng.`;
+            } else {
+                document.getElementById('yt-like-btn').classList.remove('active-like');
+                document.getElementById('yt-dislike-btn').classList.remove('active-dislike');
+                document.getElementById('yt-like-icon').className = 'fa-regular fa-thumbs-up';
+                document.getElementById('yt-dislike-icon').className = 'fa-regular fa-thumbs-down';
+                if (globalLikes === 0) {
+                    infoText.innerHTML = `Chưa có lượt thích nào. Hãy là người đầu tiên thả tim cho lá thư này!`;
+                } else {
+                    infoText.innerHTML = `Đã có <strong>${globalLikes} lượt thích</strong> ghi nhận từ cộng đồng.`;
+                }
+            }
+        }
+
+        function handleGlobalLike() {
+            if (!hasLiked) {
+                hasLiked = true;
+                if (hasDisliked) hasDisliked = false;
+                
+                // Tăng 1 trên máy chủ đám mây
+                likesRef.transaction((current) => (current || 0) + 1);
+                
+                localStorage.setItem('user_has_liked', 'true');
+                localStorage.setItem('user_has_disliked', 'false');
+            } else {
+                hasLiked = false;
+                
+                // Giảm 1 trên máy chủ đám mây
+                likesRef.transaction((current) => Math.max(0, (current || 0) - 1));
+                
+                localStorage.setItem('user_has_liked', 'false');
+            }
+            updateUI();
+        }
+
+        function handleGlobalDislike() {
+            if (!hasDisliked) {
+                hasDisliked = true;
+                if (hasLiked) {
+                    hasLiked = false;
+                    likesRef.transaction((current) => Math.max(0, (current || 0) - 1));
+                    localStorage.setItem('user_has_liked', 'false');
+                }
+                localStorage.setItem('user_has_disliked', 'true');
+            } else {
+                hasDisliked = false;
+                localStorage.setItem('user_has_disliked', 'false');
+            }
+            updateUI();
+        }
+
+        // VOICE READ API
         let synth = window.speechSynthesis;
         let utterance = null;
 
@@ -873,7 +966,7 @@
             }
         }
 
-        // 2. FONT SCALE
+        // FONT SCALE
         let currentScale = 1.0;
         function adjustFontSize(delta) {
             currentScale += delta;
@@ -882,12 +975,12 @@
             document.documentElement.style.setProperty('--font-scale', currentScale);
         }
 
-        // 3. DARK MODE
+        // DARK MODE
         function toggleDarkMode() {
             document.body.classList.toggle('dark-mode');
         }
 
-        // 4. LIGHTBOX
+        // LIGHTBOX
         function openLightbox(imgSrc) {
             document.getElementById('lightbox-img').src = imgSrc;
             document.getElementById('lightbox').style.display = 'flex';
@@ -897,108 +990,7 @@
             document.getElementById('lightbox').style.display = 'none';
         }
 
-        // 5. HYBRID CLOUD LIKE SYSTEM (HỖ TRỢ CHẠY CẢ TRÊN VSC & SERVER THẬT)
-        let globalLikes = parseInt(localStorage.getItem('global_likes_store')) || 0;
-        let hasLiked = localStorage.getItem('user_has_liked') === 'true';
-        let hasDisliked = localStorage.getItem('user_has_disliked') === 'true';
-
-        function updateUI() {
-            document.getElementById('yt-like-text').innerText = globalLikes;
-            const infoText = document.getElementById('likers-info-text');
-
-            if (hasLiked) {
-                document.getElementById('yt-like-btn').classList.add('active-like');
-                document.getElementById('yt-dislike-btn').classList.remove('active-dislike');
-                document.getElementById('yt-like-icon').className = 'fa-solid fa-thumbs-up';
-                document.getElementById('yt-dislike-icon').className = 'fa-regular fa-thumbs-down';
-                infoText.innerHTML = `Đã có <strong>${globalLikes} lượt thích</strong> (bao gồm <strong>Bạn</strong>) ghi nhận từ cộng đồng.`;
-            } else if (hasDisliked) {
-                document.getElementById('yt-like-btn').classList.remove('active-like');
-                document.getElementById('yt-dislike-btn').classList.add('active-dislike');
-                document.getElementById('yt-like-icon').className = 'fa-regular fa-thumbs-up';
-                document.getElementById('yt-dislike-icon').className = 'fa-solid fa-thumbs-down';
-                infoText.innerHTML = `Đã có <strong>${globalLikes} lượt thích</strong> ghi nhận từ cộng đồng.`;
-            } else {
-                document.getElementById('yt-like-btn').classList.remove('active-like');
-                document.getElementById('yt-dislike-btn').classList.remove('active-dislike');
-                document.getElementById('yt-like-icon').className = 'fa-regular fa-thumbs-up';
-                document.getElementById('yt-dislike-icon').className = 'fa-regular fa-thumbs-down';
-                if (globalLikes === 0) {
-                    infoText.innerHTML = `Chưa có lượt thích nào. Hãy là người đầu tiên thả tim cho lá thư này!`;
-                } else {
-                    infoText.innerHTML = `Đã có <strong>${globalLikes} lượt thích</strong> ghi nhận từ cộng đồng.`;
-                }
-            }
-        }
-
-        // Lấy dữ liệu online
-        async function fetchLikesFromApi() {
-            try {
-                let res = await fetch('https://api.counterapi.dev/v1/gui-viet-nam-cho-mai-sau-2026/likes');
-                if (res.ok) {
-                    let data = await res.json();
-                    if (data && data.count !== undefined) {
-                        globalLikes = data.count;
-                        localStorage.setItem('global_likes_store', globalLikes);
-                    }
-                }
-            } catch (e) {
-                console.log("Sử dụng bộ đếm nội bộ VSC");
-            }
-            updateUI();
-        }
-
-        fetchLikesFromApi();
-
-        async function handleGlobalLike() {
-            if (!hasLiked) {
-                hasLiked = true;
-                if (hasDisliked) hasDisliked = false;
-                globalLikes += 1;
-                localStorage.setItem('global_likes_store', globalLikes);
-                localStorage.setItem('user_has_liked', 'true');
-                localStorage.setItem('user_has_disliked', 'false');
-                updateUI();
-
-                // Đồng bộ lên máy chủ đám mây
-                try {
-                    await fetch('https://api.counterapi.dev/v1/gui-viet-nam-cho-mai-sau-2026/likes/up');
-                } catch (e) {
-                    console.log("Đã lưu lượt thích nội bộ");
-                }
-            } else {
-                hasLiked = false;
-                globalLikes = Math.max(0, globalLikes - 1);
-                localStorage.setItem('global_likes_store', globalLikes);
-                localStorage.setItem('user_has_liked', 'false');
-                updateUI();
-
-                try {
-                    await fetch('https://api.counterapi.dev/v1/gui-viet-nam-cho-mai-sau-2026/likes/down');
-                } catch (e) {
-                    console.log("Đã cập nhật lượt thích nội bộ");
-                }
-            }
-        }
-
-        function handleGlobalDislike() {
-            if (!hasDisliked) {
-                hasDisliked = true;
-                if (hasLiked) {
-                    hasLiked = false;
-                    globalLikes = Math.max(0, globalLikes - 1);
-                    localStorage.setItem('global_likes_store', globalLikes);
-                    localStorage.setItem('user_has_liked', 'false');
-                }
-                localStorage.setItem('user_has_disliked', 'true');
-            } else {
-                hasDisliked = false;
-                localStorage.setItem('user_has_disliked', 'false');
-            }
-            updateUI();
-        }
-
-        // 6. MODALS
+        // MODALS
         function openShareModal() {
             document.getElementById('share-modal').style.display = 'flex';
         }
