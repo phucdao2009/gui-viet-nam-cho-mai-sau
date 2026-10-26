@@ -159,6 +159,8 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
         .player-info {
@@ -191,6 +193,12 @@
             opacity: 0.7;
         }
 
+        .player-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
         .play-btn {
             background: var(--accent-color);
             color: white;
@@ -210,6 +218,28 @@
             transform: scale(1.08);
         }
 
+        .upload-audio-label {
+            background: rgba(0,0,0,0.06);
+            border: 1px dashed var(--border-color);
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-family: var(--font-sans);
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s;
+        }
+
+        .dark-mode .upload-audio-label {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .upload-audio-label:hover {
+            background: rgba(0,0,0,0.12);
+        }
+
         .progress-bar-container {
             width: 100%;
         }
@@ -221,6 +251,7 @@
             border-radius: 3px;
             position: relative;
             overflow: hidden;
+            cursor: pointer;
         }
 
         .progress-fill {
@@ -620,16 +651,20 @@
                     <div class="player-info">
                         <div class="player-icon"><i class="fa-solid fa-microphone-lines"></i></div>
                         <div class="player-text">
-                            <h4>Giọng đọc lá thư</h4>
-                            <p id="voice-status">Sẵn sàng đọc (Giọng đọc AI tự động)</p>
+                            <h4>Trình phát giọng đọc</h4>
+                            <p id="voice-status">Chọn file ghi âm của bạn hoặc dùng giọng đọc AI</p>
                         </div>
                     </div>
                     <div class="player-controls">
-                        <button class="play-btn" id="play-pause-btn" onclick="toggleSpeech()"><i class="fa-solid fa-play"></i></button>
+                        <label class="upload-audio-label" title="Chèn file âm thanh MP3/WAV">
+                            <i class="fa-solid fa-upload"></i> Chèn file đọc
+                            <input type="file" id="audio-file-input" accept="audio/*" style="display: none;" onchange="handleAudioUpload(event)">
+                        </label>
+                        <button class="play-btn" id="play-pause-btn" onclick="toggleMasterSpeech()"><i class="fa-solid fa-play"></i></button>
                     </div>
                 </div>
                 <div class="progress-bar-container">
-                    <div class="progress-bar">
+                    <div class="progress-bar" id="progress-container" onclick="seekAudio(event)">
                         <div class="progress-fill" id="speech-progress"></div>
                     </div>
                 </div>
@@ -686,13 +721,14 @@
             </div>
         </article>
 
+        <!-- 8 ẢNH DI SẢN & SÀI GÒN XƯA NAY -->
         <section>
             <h2 class="section-title">Di Sản & Bản Sắc Văn Hóa Việt Nam</h2>
             <div class="culture-grid">
                 
                 <div class="culture-card">
                     <div class="culture-img-box" onclick="openLightbox('1.jpg')">
-                        <img src="1.jpg" alt="Áo Dài Việt Nam[cite: 4]">
+                        <img src="1.jpg" alt="Áo Dài Việt Nam">
                     </div>
                     <div class="culture-body">
                         <h3>1. Áo Dài Việt Nam</h3>
@@ -702,7 +738,7 @@
 
                 <div class="culture-card">
                     <div class="culture-img-box" onclick="openLightbox('2.jpg')">
-                        <img src="2.jpg" alt="Nghệ Thuật Múa Rối Nước[cite: 3]">
+                        <img src="2.jpg" alt="Nghệ Thuật Múa Rối Nước">
                     </div>
                     <div class="culture-body">
                         <h3>2. Nghệ Thuật Múa Rối Nước</h3>
@@ -712,17 +748,17 @@
 
                 <div class="culture-card">
                     <div class="culture-img-box" onclick="openLightbox('3.jpg')">
-                        <img src="3.jpg" alt="Nghệ Thuật Cải Lương Nam Bộ[cite: 2]">
+                        <img src="3.jpg" alt="Nghệ Thuật Cải Lương Nam Bộ">
                     </div>
                     <div class="culture-body">
                         <h3>3. Nghệ Thuật Cải Lương Nam Bộ</h3>
-                        <p>Loại hình nghệ thuật sân khấu đặc sắc của miền Nam, kết hợp đòn ca tài tử với diễn xuất hiện đại, đong đầy giai điệu ngọt ngào và lòng nhân ái của con người phương Nam.</p>
+                        <p>Loại hình nghệ thuật sân khấu đặc sắc của miền Nam, kết hợp đờn ca tài tử với diễn xuất hiện đại, đong đầy giai điệu ngọt ngào và lòng nhân ái của con người phương Nam.</p>
                     </div>
                 </div>
 
                 <div class="culture-card">
                     <div class="culture-img-box" onclick="openLightbox('4.jpg')">
-                        <img src="4.jpg" alt="Chữ Thư Pháp Việt[cite: 1]">
+                        <img src="4.jpg" alt="Chữ Thư Pháp Việt">
                     </div>
                     <div class="culture-body">
                         <h3>4. Chữ Thư Pháp Việt</h3>
@@ -751,7 +787,7 @@
                         <img src="6.jpg" alt="Chợ Bến Thành Xưa & Nay">
                     </div>
                     <div class="culture-body">
-                        <h3>Chợ Bến Thành - Nhịp Sống Tiếp Nối</h3>
+                        <h3>6. Chợ Bến Thành - Nhịp Sống Tiếp Nối</h3>
                         <p>Dấu ấn kiến trúc biểu tượng xuyên suốt chiều dài lịch sử Thành phố. Qua bao năm tháng, Chợ Bến Thành vẫn đứng đó như một chứng nhân kết nối ký ức xưa và sự phồn vinh hiện đại.</p>
                     </div>
                 </div>
@@ -761,17 +797,17 @@
                         <img src="7.jpg" alt="Dinh Thống Nhất / Kiến Trúc Xưa & Nay">
                     </div>
                     <div class="culture-body">
-                        <h3>Di Tích Lịch Sử - Nối Liền Thời Đại</h3>
+                        <h3>7. Di Tích Lịch Sử - Nối Liền Thời Đại</h3>
                         <p>Sự đối sánh giữa những công trình cổ kính xưa và kiến trúc rực rỡ ngày nay. Nơi mỗi viên gạch, khoảng sân đều ghi dấu những bước ngoặt lịch sử quan trọng của dân tộc.</p>
                     </div>
                 </div>
 
                 <div class="culture-card">
                     <div class="culture-img-box" onclick="openLightbox('8.jpg')">
-                        <img src="8.jpg" alt="Bến Nhà Rồng & Dòng Sông Sài Gòn Xưa & Nay[cite: 5]">
+                        <img src="8.jpg" alt="Bến Nhà Rồng & Dòng Sông Sài Gòn Xưa & Nay">
                     </div>
                     <div class="culture-body">
-                        <h3>Bến Cảng Ký Ức & Đô Thị Tương Lai</h3>
+                        <h3>8. Bến Cảng Ký Ức & Đô Thị Tương Lai</h3>
                         <p>Từ bến cảng lịch sử bên dòng sông Sài Gòn trầm mặc năm xưa đến một thành phố hiện đại rực rỡ ánh đèn về đêm — minh chứng cho sự vươn mình không ngừng của Việt Nam.</p>
                     </div>
                 </div>
@@ -822,8 +858,9 @@
         <img id="lightbox-img" src="" alt="Xem ảnh phóng to">
     </div>
 
-    <!-- JAVASCRIPT HỆ THỐNG LIKE CHUẨN MƯỢT MÀ -->
+    <!-- JAVASCRIPT XỬ LÝ ÂM THANH VÀ TƯƠNG TÁC -->
     <script>
+        // Quản lý Like hệ thống Local
         let currentLikes = parseInt(localStorage.getItem('letter_total_likes')) || 0;
         let isLiked = localStorage.getItem('user_has_liked') === 'true';
         let isDisliked = localStorage.getItem('user_has_disliked') === 'true';
@@ -893,27 +930,86 @@
 
         updateUI();
 
-        // VOICE READ API
+        // XỬ LÝ ÂM THANH (CHÈN FILE HOẶC AI ĐỌC DỰ PHÒNG)
+        let customAudio = null;
+        let isCustomAudioPlaying = false;
+        
         let synth = window.speechSynthesis;
         let utterance = null;
+        let isAiSpeaking = false;
 
-        function toggleSpeech() {
-            if (!synth) {
-                alert("Trình duyệt của bạn không hỗ trợ đọc tự động!");
+        function handleAudioUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (customAudio) {
+                customAudio.pause();
+            }
+
+            const audioUrl = URL.createObjectURL(file);
+            customAudio = new Audio(audioUrl);
+
+            customAudio.ontimeupdate = function() {
+                let pct = (customAudio.currentTime / customAudio.duration) * 100;
+                document.getElementById('speech-progress').style.width = pct + '%';
+            };
+
+            customAudio.onended = function() {
+                isCustomAudioPlaying = false;
+                document.getElementById('play-pause-btn').innerHTML = '<i class="fa-solid fa-play"></i>';
+                document.getElementById('voice-status').innerText = "Đã phát xong file ghi âm";
+            };
+
+            document.getElementById('voice-status').innerText = "Đã tải file: " + file.name;
+            alert("Đã chèn file âm thanh thành công! Nhấn nút Play để nghe.");
+        }
+
+        function seekAudio(event) {
+            const container = document.getElementById('progress-container');
+            const rect = container.getBoundingClientRect();
+            const clickX = event.clientX - rect.left;
+            const width = rect.width;
+            const pct = clickX / width;
+
+            if (customAudio && customAudio.duration) {
+                customAudio.currentTime = pct * customAudio.duration;
+            }
+        }
+
+        function toggleMasterSpeech() {
+            const btn = document.getElementById('play-pause-btn');
+            const status = document.getElementById('voice-status');
+
+            // Nếu người dùng đã chèn file audio riêng
+            if (customAudio) {
+                if (isCustomAudioPlaying) {
+                    customAudio.pause();
+                    isCustomAudioPlaying = false;
+                    btn.innerHTML = '<i class="fa-solid fa-play"></i>';
+                    status.innerText = "Đã tạm dừng file ghi âm";
+                } else {
+                    customAudio.play();
+                    isCustomAudioPlaying = true;
+                    btn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+                    status.innerText = "Đang phát file ghi âm...";
+                }
                 return;
             }
 
-            const btn = document.getElementById('play-pause-btn');
-            const status = document.getElementById('voice-status');
+            // Nếu không chèn file, dùng giọng đọc AI mặc định trình duyệt
+            if (!synth) {
+                alert("Trình duyệt không hỗ trợ đọc tự động!");
+                return;
+            }
 
             if (synth.speaking && !synth.paused) {
                 synth.pause();
                 btn.innerHTML = '<i class="fa-solid fa-play"></i>';
-                status.innerText = "Đã tạm dừng";
+                status.innerText = "Đã tạm dừng đọc AI";
             } else if (synth.paused) {
                 synth.resume();
                 btn.innerHTML = '<i class="fa-solid fa-pause"></i>';
-                status.innerText = "Đang đọc lá thư...";
+                status.innerText = "Đang tiếp tục đọc...";
             } else {
                 let text = document.getElementById('letter-body').innerText;
                 utterance = new SpeechSynthesisUtterance(text);
@@ -922,7 +1018,7 @@
 
                 utterance.onstart = function () {
                     btn.innerHTML = '<i class="fa-solid fa-pause"></i>';
-                    status.innerText = "Đang đọc lá thư...";
+                    status.innerText = "AI đang đọc lá thư...";
                 };
 
                 utterance.onend = function () {
@@ -942,7 +1038,7 @@
             }
         }
 
-        // FONT SCALE
+        // CỠ CHỮ
         let currentScale = 1.0;
         function adjustFontSize(delta) {
             currentScale += delta;
@@ -956,7 +1052,7 @@
             document.body.classList.toggle('dark-mode');
         }
 
-        // LIGHTBOX
+        // LIGHTBOX ẢNH
         function openLightbox(imgSrc) {
             document.getElementById('lightbox-img').src = imgSrc;
             document.getElementById('lightbox').style.display = 'flex';
