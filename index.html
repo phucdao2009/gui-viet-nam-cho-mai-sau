@@ -651,16 +651,13 @@
                     <div class="player-info">
                         <div class="player-icon"><i class="fa-solid fa-microphone-lines"></i></div>
                         <div class="player-text">
-                            <h4>Trình phát giọng đọc</h4>
-                            <p id="voice-status">Chọn file ghi âm của bạn hoặc dùng giọng đọc AI</p>
+                            <h4>Giọng đọc thuyết minh</h4>
+                            <p id="voice-status">Đang tải âm thanh từ video...</p>
                         </div>
                     </div>
                     <div class="player-controls">
-                        <label class="upload-audio-label" title="Chèn file âm thanh MP3/WAV">
-                            <i class="fa-solid fa-upload"></i> Chèn file đọc
-                            <input type="file" id="audio-file-input" accept="audio/*" style="display: none;" onchange="handleAudioUpload(event)">
-                        </label>
-                        <button class="play-btn" id="play-pause-btn" onclick="toggleMasterSpeech()"><i class="fa-solid fa-play"></i></button>
+                        <!-- Nút Play/Pause trực tiếp file audio tích hợp -->
+                        <button class="play-btn" id="play-pause-btn" onclick="toggleAudio()"><i class="fa-solid fa-play"></i></button>
                     </div>
                 </div>
                 <div class="progress-bar-container">
@@ -669,6 +666,9 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Khai báo file âm thanh gốc (Bạn hãy đổi tên file 'audio-goc.mp3' thành tên file âm thanh lấy từ video của bạn) -->
+            <audio id="main-audio" src="1234.mp4" preload="auto"></audio>
 
             <div class="letter-content" id="letter-body">
                 <p class="salutation">Chào bạn - người bạn đồng hành ở một ga tàu tương lai!</p>
@@ -858,7 +858,7 @@
         <img id="lightbox-img" src="" alt="Xem ảnh phóng to">
     </div>
 
-    <!-- JAVASCRIPT XỬ LÝ ÂM THANH VÀ TƯƠNG TÁC -->
+    <!-- JAVASCRIPT XỬ LÝ ÂM THANH GỐC VÀ TƯƠNG TÁC -->
     <script>
         // Quản lý Like hệ thống Local
         let currentLikes = parseInt(localStorage.getItem('letter_total_likes')) || 0;
@@ -930,39 +930,42 @@
 
         updateUI();
 
-        // XỬ LÝ ÂM THANH (CHÈN FILE HOẶC AI ĐỌC DỰ PHÒNG)
-        let customAudio = null;
-        let isCustomAudioPlaying = false;
-        
-        let synth = window.speechSynthesis;
-        let utterance = null;
-        let isAiSpeaking = false;
+        // XỬ LÝ PHÁT ÂM THANH GỐC
+        const audio = document.getElementById('main-audio');
+        const playBtn = document.getElementById('play-pause-btn');
+        const statusText = document.getElementById('voice-status');
 
-        function handleAudioUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+        audio.onloadedmetadata = function() {
+            statusText.innerText = "Đã sẵn sàng phát âm thanh thuyết minh";
+        };
 
-            if (customAudio) {
-                customAudio.pause();
+        audio.onerror = function() {
+            statusText.innerText = "Lỗi: Không tìm thấy file 'audio-goc.mp3'";
+        };
+
+        function toggleAudio() {
+            if (audio.paused) {
+                audio.play();
+                playBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+                statusText.innerText = "Đang phát âm thanh...";
+            } else {
+                audio.pause();
+                playBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
+                statusText.innerText = "Đã tạm dừng";
             }
-
-            const audioUrl = URL.createObjectURL(file);
-            customAudio = new Audio(audioUrl);
-
-            customAudio.ontimeupdate = function() {
-                let pct = (customAudio.currentTime / customAudio.duration) * 100;
-                document.getElementById('speech-progress').style.width = pct + '%';
-            };
-
-            customAudio.onended = function() {
-                isCustomAudioPlaying = false;
-                document.getElementById('play-pause-btn').innerHTML = '<i class="fa-solid fa-play"></i>';
-                document.getElementById('voice-status').innerText = "Đã phát xong file ghi âm";
-            };
-
-            document.getElementById('voice-status').innerText = "Đã tải file: " + file.name;
-            alert("Đã chèn file âm thanh thành công! Nhấn nút Play để nghe.");
         }
+
+        audio.ontimeupdate = function() {
+            if (audio.duration) {
+                let pct = (audio.currentTime / audio.duration) * 100;
+                document.getElementById('speech-progress').style.width = pct + '%';
+            }
+        };
+
+        audio.onended = function() {
+            playBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
+            statusText.innerText = "Đã phát xong";
+        };
 
         function seekAudio(event) {
             const container = document.getElementById('progress-container');
@@ -971,70 +974,8 @@
             const width = rect.width;
             const pct = clickX / width;
 
-            if (customAudio && customAudio.duration) {
-                customAudio.currentTime = pct * customAudio.duration;
-            }
-        }
-
-        function toggleMasterSpeech() {
-            const btn = document.getElementById('play-pause-btn');
-            const status = document.getElementById('voice-status');
-
-            // Nếu người dùng đã chèn file audio riêng
-            if (customAudio) {
-                if (isCustomAudioPlaying) {
-                    customAudio.pause();
-                    isCustomAudioPlaying = false;
-                    btn.innerHTML = '<i class="fa-solid fa-play"></i>';
-                    status.innerText = "Đã tạm dừng file ghi âm";
-                } else {
-                    customAudio.play();
-                    isCustomAudioPlaying = true;
-                    btn.innerHTML = '<i class="fa-solid fa-pause"></i>';
-                    status.innerText = "Đang phát file ghi âm...";
-                }
-                return;
-            }
-
-            // Nếu không chèn file, dùng giọng đọc AI mặc định trình duyệt
-            if (!synth) {
-                alert("Trình duyệt không hỗ trợ đọc tự động!");
-                return;
-            }
-
-            if (synth.speaking && !synth.paused) {
-                synth.pause();
-                btn.innerHTML = '<i class="fa-solid fa-play"></i>';
-                status.innerText = "Đã tạm dừng đọc AI";
-            } else if (synth.paused) {
-                synth.resume();
-                btn.innerHTML = '<i class="fa-solid fa-pause"></i>';
-                status.innerText = "Đang tiếp tục đọc...";
-            } else {
-                let text = document.getElementById('letter-body').innerText;
-                utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'vi-VN';
-                utterance.rate = 0.95;
-
-                utterance.onstart = function () {
-                    btn.innerHTML = '<i class="fa-solid fa-pause"></i>';
-                    status.innerText = "AI đang đọc lá thư...";
-                };
-
-                utterance.onend = function () {
-                    btn.innerHTML = '<i class="fa-solid fa-play"></i>';
-                    status.innerText = "Đã đọc xong";
-                    document.getElementById('speech-progress').style.width = '100%';
-                };
-
-                utterance.onboundary = function (event) {
-                    let totalLen = text.length;
-                    let charIdx = event.charIndex;
-                    let pct = (charIdx / totalLen) * 100;
-                    document.getElementById('speech-progress').style.width = pct + '%';
-                };
-
-                synth.speak(utterance);
+            if (audio.duration) {
+                audio.currentTime = pct * audio.duration;
             }
         }
 
